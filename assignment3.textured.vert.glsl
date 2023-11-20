@@ -13,6 +13,10 @@ uniform mat4x4 u_p;
 
 // output to fragment stage
 // TODO: Create varyings to pass data to the fragment stage (position, texture coords, and more)
+out mat3x3 tbn;
+out vec2 texture_coord;
+out vec3 position;
+out mat4x4 o_u_v;
 
 void main() {
 
@@ -25,9 +29,18 @@ void main() {
     // TODO: Use the Gram-Schmidt process to re-orthogonalize tangents
     // NOTE: Different from the book, try to do all calculations in world space using the TBN to transform normals
     // HINT: Refer to https://learnopengl.com/Advanced-Lighting/Normal-Mapping for all above
-    mat3 tbn = mat3(0);
+
+    vec3 T = normalize(vec3(u_m * vec4(a_tangent, 0.0)));
+    vec3 N = normalize(vec3(u_m * vec4(a_normal, 0.0)));
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+
+    tbn = mat3(T, B, N);
 
     // TODO: Forward data to fragment stage
+    texture_coord = a_texture_coord;
+    position = vec3(vertex_position_world);
+    o_u_v = u_v;
 
     gl_Position = u_p * u_v * vertex_position_world;
 

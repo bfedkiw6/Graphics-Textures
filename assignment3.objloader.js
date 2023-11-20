@@ -98,11 +98,18 @@ class OBJLoader {
         // Reorder entries to match the order of vertex position indices
         [vertex_positions, vertex_normals, vertex_texture_coords, position_indices] = this.resolveIndexGroups(vertex_positions, vertex_normals, vertex_texture_coords, position_indices, normal_indices, texture_coord_indices)
 
-        throw '"OBJLoader.load" is incomplete'
+        //throw '"OBJLoader.load" is incomplete'
 
         // TODO: Merge vertex positions and normals into a single vertex list
         // TODO: If the loaded material has texture(s), pass tangents and texture coordinates too
         let vertex_data = []
+        for (let j = 0; j < vertex_positions.length; j = j + 3) {
+            vertex_data.push(vertex_positions[j], vertex_positions[j+1], vertex_positions[j+2])
+        }
+        for (let k = 0; k < vertex_normals.length; k = k + 3) {
+            vertex_data.push(vertex_normals[k], vertex_normals[k+1], vertex_normals[k+2])
+        }
+
         if (material.hasTexture()) {
             // If there is a texture, we made sure to have texture coordinates
             // We calculate the per-vertex tangents in all cases even if there is no normal map
@@ -110,6 +117,12 @@ class OBJLoader {
             vertex_tangents = this.calculateTangents(vertex_positions, vertex_texture_coords, position_indices)
             
             // TODO: Pass tangents and texture coordinates
+            for (let x = 0; x < vertex_tangents.length; x = x + 3) {
+                vertex_data.push(vertex_tangents[x], vertex_tangents[x+1], vertex_tangents[x+2])
+            }
+            for (let y = 0; y < vertex_texture_coords.length; y = y + 2) {
+                vertex_data.push(vertex_texture_coords[y], vertex_texture_coords[y+1])
+            }
         }
 
         return [ vertex_data, position_indices, material ]
